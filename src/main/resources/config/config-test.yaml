@@ -1,0 +1,14 @@
+#Schedule to run daily at 8:00 AM
+scheduler:
+  cron:
+    expression: "0 0 8 * * ?"
+    timezone: "America/New_York"
+
+#Salesforce
+salesforce:
+  tokenurl: ""
+      
+  
+#Outlook  
+email:
+  emailTo: ""

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd">
+		<flow name="fs-woocommerce-sf-sync-app-flow" doc:id="13897371-b91d-47a2-b686-317ec5aa1047" >
+		<scheduler doc:name="Sync" doc:id="8e76b5fa-420d-438f-8798-c37f1a157356" >
+			<scheduling-strategy >
+				<cron expression="${scheduler.cron.expression}" timeZone="${scheduler.cron.timezone}" />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="START" doc:id="21e3e6f6-1738-47e0-aa5d-4c94c7e05eac" message='#["START: Scheduler for WooCommerce to Salesforce"]'/>
+		<flow-ref doc:name="main-woocommerce-sf-sync-sub-flow" doc:id="417e6e6f-27d3-4cc4-b9db-af21de97e4cc" name="main-woocommerce-sf-sync-sub-flow"/>
+		
+		<logger level="INFO" doc:name="END" doc:id="8353832d-c9ae-4cbd-90a8-faa1f2b9c98d" message='#["END: Scheduler for WooCommerce to Salesforce"]' />
+	
+</flow>
+</mule>

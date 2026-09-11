@@ -1,0 +1,22 @@
+#Schedule to run daily at 8:00 AM
+scheduler:
+  cron:
+    expression: "0 0 8 * * ?"
+    timezone: "America/New_York"
+
+#Salesforce
+salesforce:
+  tokenurl: "https://fullswinggolf--plative.sandbox.my.salesforce.com/services/oauth2/token"
+
+#Snowflake
+woocommerce:
+  host: "shop-staging.fullswinggolf.com"
+  port: "443"
+  basePath: "/wp-json"
+  method: "HTTPS"
+  path:
+    order: "/wc/v3/orders"
+  
+#Outlook  
+email:
+  emailTo: "hsingh@plative.com"

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_config" doc:name="HTTP Request config" doc:id="b7ccc2c2-9255-4f9d-9bc4-38ec3c02d5a4" basePath="#[vars.httpOperation.basePath]" sendCorrelationId="ALWAYS">
+		<http:request-connection protocol="HTTPS" host="#[vars.httpOperation.host]">
+			<reconnection >
+				<reconnect />
+			</reconnection>
+			<http:authentication >
+				<http:basic-authentication username="${secure::woocommerce.clientKey}" password="${secure::woocommerce.clientSecret}" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<sub-flow name="common-request-sub-flow" doc:id="ccd99d6a-8800-494a-ba07-ad5ef68b0853" >
+		<logger level="INFO" doc:name="Before Making Request Call" doc:id="129cdcab-6c3b-4ef4-bee2-ca077e2c231b" message='#[output application/json&#10;---&#10;{&#10;	"Flow Name" : flow.name,&#10;	"UUID" : correlationId,&#10;	"Message" : "Before Making Request Call"&#10;}]'/>
+		<http:request doc:name="Request" doc:id="d4bb500a-2cbd-48a2-af12-c8409ed81e99" config-ref="HTTP_Request_config" path="#[vars.httpOperation.path]" sendCorrelationId="ALWAYS" correlationId="#[correlationId]">
+			<http:query-params ><![CDATA[#[output applciation/json
+---
+vars.httpOperation.queryParams]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="After Making Request Call" doc:id="9753d2ab-3fe4-49ad-994b-8426f4377c6f" message='#[output application/json&#10;---&#10;{&#10;	"Flow Name" : flow.name,&#10;	"UUID" : correlationId,&#10;	"Message" : "After Making Request Call"&#10;}]'/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="main-woocommerce-sf-sync-sub-flow" doc:id="87355063-99ff-46f6-9787-df164cd59271" >
+		<set-variable value="#[(now() &gt;&gt; 'UTC') as String {format: &quot;yyyy-MM-dd'T'HH:mm:ss.SSS'Z'&quot;}]" doc:name="currentTimeStamp" doc:id="3ccf5c66-029c-4bb0-bd14-95c59964304d" variableName="currentTimeStamp" />
+		<logger level="INFO" doc:name="Log Current Time Stamp" doc:id="d5d3ccb3-9c9c-4c6e-b7c5-e509f1f7835a" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"message": "",&#10;	"currentTimeStamp": vars.currentTimeStamp&#10;}]' />
+		<os:retrieve doc:name="lastTimeStamp" doc:id="0e497513-c11a-4f65-9b9b-3d2ae3cca779" key="lastTimeStamp_orders" objectStore="Object_store" target="lastTimeStamp">
+			<os:default-value ><![CDATA[#['1000-01-01T00:00:00' as String {format: "yyyy-MM-dd'T'HH:mm:ss"}]]]></os:default-value>
+		</os:retrieve>
+		<ee:transform doc:name="httpOperation" doc:id="5e76ec94-2b8f-400f-935b-101d4b5be7e4" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="httpOperation" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	host: p('woocommerce.host'),
+	port: p('woocommerce.port'),
+	method: p('woocommerce.method'),
+	basePath: p('woocommerce.basePath'),
+	path: p('woocommerce.path.order'),
+	queryParams: {
+		"after": vars.lastTimeStamp
+	}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="common-request-sub-flow" doc:id="d9b3acae-a471-4b07-8344-058e363bd788" name="common-request-sub-flow"/>
+		<flow-ref doc:name="Flow Reference" doc:id="f0754add-20c1-414a-8305-c560744ffb43" />
+		<logger level="INFO" doc:name="temp logger" doc:id="f4019248-8412-489f-abfb-261541be565b" message="#[payload]"/>
+		<os:store doc:name="lastTimeStamp_orders" doc:id="862fdc72-aeba-47f8-840c-6e503d7daf7a" key="lastTimeStamp_orders" objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.currentTimeStamp]]]></os:value>
+		</os:store>
+	</sub-flow>
+</mule>

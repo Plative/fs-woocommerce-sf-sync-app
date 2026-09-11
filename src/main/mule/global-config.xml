@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:outlook365="http://www.mulesoft.org/schema/mule/outlook365" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd
+http://www.mulesoft.org/schema/mule/outlook365 http://www.mulesoft.org/schema/mule/outlook365/current/mule-outlook365.xsd">
+	<global-property doc:name="Global Property" doc:id="5f18e815-4e99-4345-81af-77bb8ee2c889" name="mule.encryptionKey" value="SQA@Plative12345" />
+	<global-property doc:name="Global Property" doc:id="85409904-e275-4c27-ad53-4c0d7b42f53d" name="mule.env" value="sandbox" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="bda07559-cfd9-46a0-9c1c-569b18365599" >
+		<salesforce:oauth-client-credentials-connection >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+			<salesforce:oauth-client-credentials clientId="${secure::salesforce.clientId}" clientSecret="${secure::salesforce.clientSecret}" tokenUrl='#[p("salesforce.tokenurl")]' />
+			<salesforce:oauth-store-config objectStore="Object_store_salesforce_oauth" />
+		
+</salesforce:oauth-client-credentials-connection>
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="a543a0be-10c9-48c5-b2de-17ca66250d33" doc:description="env-specific yaml" file="config/config-${mule.env}.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="7388e656-2d0b-463c-abfc-f8f3aa70e3d8" file="config/secure-config-${mule.env}.yaml" key="${mule.encryptionKey}"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="101da9f4-2f79-4559-a244-97c76bc7fed8" doc:description="common.yaml" file="config/common.yaml" />
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="83876b7f-5516-48a5-9506-d1a35e7ca072" >
+		<os:connection >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+		</os:connection>
+	</os:config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="e580f52b-2401-408b-ade4-30b9896aa622" maxEntries="10" entryTtl="30" expirationInterval="10" expirationIntervalUnit="DAYS" config-ref="ObjectStore_Config" entryTtlUnit="DAYS"/>
+	<os:object-store name="Object_store_salesforce_oauth" doc:name="Object store" doc:id="e3285748-ccea-41ea-b00f-69b91ec27f78" entryTtl="30" entryTtlUnit="MINUTES" expirationInterval="10" />
+	<os:object-store name="Outlook_Object_store" doc:name="Object store" doc:id="4ba4005f-994a-421b-b50c-e507fb1c98a4" maxEntries="2" entryTtl="7" entryTtlUnit="DAYS" expirationInterval="6" expirationIntervalUnit="DAYS" />
+</mule>
+	

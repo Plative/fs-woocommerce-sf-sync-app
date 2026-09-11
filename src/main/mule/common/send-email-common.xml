@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:outlook365="http://www.mulesoft.org/schema/mule/outlook365"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/outlook365 http://www.mulesoft.org/schema/mule/outlook365/current/mule-outlook365.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="send-error-email-common-sub-flow" doc:id="eb0775c9-5e79-4a20-a634-f8ac5e4da043" >
+		<logger level="INFO" doc:name="Before Sending Email" doc:id="6eb0039e-2369-4a68-96ed-81bef0d20dd8" message="Before Sending Error Email Alert"/>
+		<ee:transform doc:name="error payload" doc:id="b9fc5bfe-b797-447d-b75e-8ece8a5d698e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+// Recursive function to render nested Objects as tables and Arrays as lists
+fun renderHTML(value) = 
+    if (value is Object)
+        "<table border='1' cellpadding='5' style='border-collapse: collapse; width: 100%;'>" ++
+        (
+            (value pluck (v, k) -> 
+                "<tr>
+                    <td bgcolor='#f9f9f9' style='width: 30%;'><b>" ++ (k as String) ++ ":</b></td>
+                    <td>" ++ renderHTML(v) ++ "</td>
+                </tr>"
+            ) joinBy ""
+        ) ++
+        "</table>"
+    else if (value is Array)
+        "<ul>" ++ 
+        (
+            (value map (v) -> 
+                "<li>" ++ renderHTML(v) ++ "</li>"
+            ) joinBy ""
+        ) ++ 
+        "</ul>"
+    else 
+        (value as String default "")
+
+// Dynamically generate the main rows (Removed the invalid do block)
+var dynamicRows = (vars.error pluck (value, key) -> 
+    "<tr>
+      <td bgcolor='#f2f2f2' style='width: 20%;'><b>" ++ (key as String) ++ ":</b></td>
+      <td>" ++ renderHTML(value) ++ "</td>
+    </tr>"
+) joinBy ""
+
+---
+{
+  "message": {
+    "subject": Mule::p('mule.env') ++ " - MuleSoft - Error Alert - " ++ Mule::p('app.name'),
+    "body": {
+      "contentType": "HTML",
+      "content": "<h3> MuleSoft - Error Alert - $(p('app.name') default 'Unknown App')</h3>
+                  <p>Hello,</p>
+                  <p>An error occurred in the Mule Application. Please find the details below:</p>
+                  <table border='1' cellpadding='5' style='border-collapse: collapse; width: 100%;'>"
+                  ++ dynamicRows ++
+                  "</table>
+                  <p>Please check the logs to investigate the issue further.</p>"
+    },
+    "toRecipients": (Mule::p('email.emailTo') default "" splitBy ";") map ((email) -> {
+      "emailAddress": {
+        "address": trim(email)
+      }
+    })
+  },
+  "saveToSentItems": "true"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<outlook365:send-mail doc:name="Send mail" doc:id="d292cd13-afe9-4925-a021-0285fcd91dd0" config-ref="Outlook365_Config" userId="#[Mule::p('email.emailFrom')]"/>
+		<logger level="INFO" doc:name="After Sending Email" doc:id="1f6b77fb-e3ab-40fa-9246-d6eb6eca1521" message="After Sending Error Email Alert"/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,14 @@
+#Salesforce
+salesforce :
+  clientId : "![g/khAZbUPlpznziSHGDB9HbRxywwMq/gxvhWljwJsTnQNuD5QKx9ThcW+IQP9NrzDMGBNMH/Ks7UQH9k7YKKQsI+44XtZrF5uoPdZVIEcsh+pdd7yK9kIV8krE+2T7t/]"
+  clientSecret : "![GwfdeNP6mQ2z/uJs2u8QAgRTR1wjrkH++9zEo8d2JxhNfDmlqclBzD9phvTldCQKKzXzGg0gUF8z6Ug3wOxPSddGUEqauEYAiWw+bWV0U/w=]" 
+
+#Woocommerce
+woocommerce:
+  clientKey: "![/oLBjXIQWmdIkihxK3WVxMq7KcBLWSwUx0PWjkJ6MqUx6ZcJieQVjRKNcsjLthwT]"
+  clientSecret: "![QQw6ijuLCMte4k6efvkiQ2eXgxBHsGTmNjiKPNIPj7ml/uUtUA7x3gN+Ryxw4FN3]"
+  
+#outlook
+email:
+  clientId: "![]"
+  clientSecret: "![]"  
